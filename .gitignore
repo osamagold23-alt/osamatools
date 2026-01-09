@@ -1,0 +1,29 @@
+
+
+
+
+
+
+
+
+# إخفاء ملفات السجلات التي تحتوي على IPs الضحايا
+logs.txt
+captured_data.db
+
+# إخفاء ملفات الإعدادات الشخصية
+config.json
+.env
+
+# إخفاء ملفات النظام والمجلدات الوهمية
+venv/
+__pycache__/
+*.py
+
+
+
+
+
+venv/
+__pycache__/
+*.pyc
+.DS_Store
